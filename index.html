@@ -386,6 +386,87 @@
   @media (max-width: 900px) { .course-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 600px) { .course-grid { grid-template-columns: 1fr; } }
 
+  /* ======== WRITING / BLOG ======== */
+  .blog-themes { margin-top: 8px; }
+  .blog-theme-row { margin-bottom: 22px; }
+  .blog-theme-head {
+    display: flex; align-items: center; gap: 10px;
+    margin: 0 0 12px;
+    color: var(--muted);
+    font-size: 0.82em; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .blog-theme-head .ico {
+    width: 26px; height: 26px; border-radius: 6px;
+    background: var(--soft-1);
+    border: 1px solid var(--border);
+    display: inline-grid; place-items: center;
+    font-size: 0.95em;
+  }
+  .blog-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+  }
+  .post {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    padding: 18px 18px 16px;
+    color: var(--text);
+    text-decoration: none;
+    display: flex; flex-direction: column;
+    transition: transform .12s, border-color .12s, background .12s;
+    min-height: 150px;
+  }
+  .post:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    background: var(--panel-2);
+    text-decoration: none;
+  }
+  .post .top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.7em; letter-spacing: 0.04em;
+  }
+  .post .status {
+    color: var(--accent);
+    background: var(--accent-glow);
+    padding: 2px 8px; border-radius: 999px;
+    font-weight: 600;
+  }
+  .post .read { color: var(--muted-2); font-feature-settings: "tnum"; }
+  .post h4 {
+    margin: 0 0 6px; font-size: 0.96rem;
+    font-weight: 600; line-height: 1.35;
+    letter-spacing: -0.005em;
+  }
+  .post p {
+    margin: 0; color: var(--muted);
+    font-size: 0.84em; line-height: 1.5;
+    flex: 1;
+  }
+  .post .footer-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+    font-size: 0.74em; color: var(--muted-2);
+  }
+  .post .arrow { color: var(--accent); }
+  @media (max-width: 900px) { .blog-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .blog-grid { grid-template-columns: 1fr; } }
+
+  .blog-cta {
+    margin-top: 24px;
+    background: linear-gradient(135deg, rgba(217,119,87,0.06), rgba(93,138,168,0.06));
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 22px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .blog-cta p { margin: 0; color: var(--muted); font-size: 0.92em; }
+  .blog-cta p strong { color: var(--text); }
+
   /* ======== MORE ======== */
   .more {
     background: var(--panel);
@@ -448,6 +529,7 @@
       <a href="#about" class="hide-sm">About</a>
       <a href="#work">Featured</a>
       <a href="#courses">Courses</a>
+      <a href="#writing">Writing</a>
       <a href="#contact" class="hide-sm">Contact</a>
       <a href="https://github.com/supachai-j">GitHub ↗</a>
       <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark/light theme" title="Toggle theme">
@@ -675,6 +757,168 @@
       </div>
     </a>
 
+  </div>
+</section>
+
+<!-- ============= WRITING / BLOG ============= -->
+<section class="block" id="writing">
+  <span class="section-label">Writing</span>
+  <h2 class="section-title">In the pipeline</h2>
+  <p style="color: var(--muted); margin: 0 0 28px; font-size: 1em;">
+    Posts I'm drafting — mostly on AI agents, training pedagogy, and Kubernetes. Mix of English and Thai.
+    <br><span style="color: var(--muted-2); font-size: 0.92em;">โพสต์ที่กำลังเขียน — เน้น AI agent, การสอน และ Kubernetes ผสมไทย-อังกฤษ</span>
+  </p>
+
+  <div class="blog-themes">
+
+    <!-- AI Agents -->
+    <div class="blog-theme-row">
+      <div class="blog-theme-head"><span class="ico">🤖</span> AI Agents</div>
+      <div class="blog-grid">
+
+        <a class="post" href="https://jaturaprom.medium.com/" rel="noopener">
+          <div class="top">
+            <span class="status">Coming soon</span>
+            <span class="read">~8 min</span>
+          </div>
+          <h4>Why I rewrote our team's runbooks as Agent Skills</h4>
+          <p>The migration story — what worked, what didn't, and how the team's operations changed once Claude could read SKILL.md.</p>
+          <div class="footer-row">
+            <span>EN · TH planned</span>
+            <span class="arrow">notify me →</span>
+          </div>
+        </a>
+
+        <a class="post" href="https://jaturaprom.medium.com/" rel="noopener">
+          <div class="top">
+            <span class="status">Coming soon</span>
+            <span class="read">~12 min</span>
+          </div>
+          <h4>SKILL.md from scratch — a 30-minute walkthrough</h4>
+          <p>From an empty folder to a working skill that activates in Claude Code, Cursor, and Copilot — with the same one file.</p>
+          <div class="footer-row">
+            <span>Tutorial · EN+TH</span>
+            <span class="arrow">notify me →</span>
+          </div>
+        </a>
+
+        <a class="post" href="https://jaturaprom.medium.com/" rel="noopener">
+          <div class="top">
+            <span class="status">Coming soon</span>
+            <span class="read">~10 min</span>
+          </div>
+          <h4>Description optimization is A/B testing for AI activation</h4>
+          <p>Train/validation splits, trigger-rate measurement, and 5-iteration loops — the most underrated dial in any skill.</p>
+          <div class="footer-row">
+            <span>Deep dive · EN</span>
+            <span class="arrow">notify me →</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- Training & Teaching -->
+    <div class="blog-theme-row">
+      <div class="blog-theme-head"><span class="ico">📚</span> Training &amp; teaching</div>
+      <div class="blog-grid">
+
+        <a class="post" href="https://jaturaprom.medium.com/" rel="noopener">
+          <div class="top">
+            <span class="status">Coming soon</span>
+            <span class="read">~7 min</span>
+          </div>
+          <h4>Bilingual technical writing: English code, Thai prose</h4>
+          <p>10 years of teaching engineers in Thai while keeping the technical English intact. Practical patterns, real examples.</p>
+          <div class="footer-row">
+            <span>Meta · TH+EN</span>
+            <span class="arrow">notify me →</span>
+          </div>
+        </a>
+
+        <a class="post" href="https://jaturaprom.medium.com/" rel="noopener">
+          <div class="top">
+            <span class="status">Coming soon</span>
+            <span class="read">~9 min</span>
+          </div>
+          <h4>The LLM Wiki pattern: knowledge that compounds</h4>
+          <p>RAG retrieves and forgets. A wiki compounds. Three-layer architecture for turning research sessions into durable team knowledge.</p>
+          <div class="footer-row">
+            <span>Engineering · EN</span>
+            <span class="arrow">notify me →</span>
+          </div>
+        </a>
+
+        <a class="post" href="https://jaturaprom.medium.com/" rel="noopener">
+          <div class="top">
+            <span class="status">Drafting</span>
+            <span class="read">~6 min</span>
+          </div>
+          <h4>Building reveal.js decks for training (and fixing layout that breaks)</h4>
+          <p>Why I write decks by hand, the canvas-size trap, and the CSS pattern that finally stopped slides from cropping.</p>
+          <div class="footer-row">
+            <span>Practical · EN</span>
+            <span class="arrow">notify me →</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- Kubernetes & Infra -->
+    <div class="blog-theme-row">
+      <div class="blog-theme-head"><span class="ico">⎈</span> Kubernetes &amp; infra</div>
+      <div class="blog-grid">
+
+        <a class="post" href="https://jaturaprom.medium.com/" rel="noopener">
+          <div class="top">
+            <span class="status">Coming soon</span>
+            <span class="read">~8 min</span>
+          </div>
+          <h4>Five Kubernetes anti-patterns I see every week</h4>
+          <p>Resource limits I keep correcting, secret-handling mistakes, and the one labeling habit that breaks everyone's HPA.</p>
+          <div class="footer-row">
+            <span>Field notes · EN</span>
+            <span class="arrow">notify me →</span>
+          </div>
+        </a>
+
+        <a class="post" href="https://jaturaprom.medium.com/" rel="noopener">
+          <div class="top">
+            <span class="status">Coming soon</span>
+            <span class="read">~10 min</span>
+          </div>
+          <h4>CKA in Thai: how I structured the syllabus</h4>
+          <p>The exam blueprint, mapped to a 12-week curriculum that actually fits how Thai engineering teams learn. Plus what I'd cut.</p>
+          <div class="footer-row">
+            <span>Curriculum · TH</span>
+            <span class="arrow">notify me →</span>
+          </div>
+        </a>
+
+        <a class="post" href="https://jaturaprom.medium.com/" rel="noopener">
+          <div class="top">
+            <span class="status">Drafting</span>
+            <span class="read">~12 min</span>
+          </div>
+          <h4>The Kubernetes runbook I wish I had as a junior SRE</h4>
+          <p>The real things you debug at 2am — DNS, evictions, image pulls, OOM kills — and how to get the answer in under 10 minutes.</p>
+          <div class="footer-row">
+            <span>Operations · EN</span>
+            <span class="arrow">notify me →</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="blog-cta">
+    <p>
+      <strong>Until then —</strong> I publish on Medium. Subscribe for drops as these go live.
+    </p>
+    <a class="btn ghost" href="https://jaturaprom.medium.com/">Read me on Medium →</a>
   </div>
 </section>
 
