@@ -263,6 +263,63 @@
   .featured .actions a.go { background: var(--accent); color: #1a0f08; border-color: var(--accent); }
   .featured .actions a.go:hover { background: #e88563; }
 
+  /* ======== COURSES GRID ======== */
+  .course-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  }
+  .course {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 20px 18px;
+    color: var(--text);
+    text-decoration: none;
+    display: flex; flex-direction: column;
+    transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    min-height: 170px;
+  }
+  .course:hover {
+    transform: translateY(-2px);
+    border-color: rgba(217,119,87,0.3);
+    background: var(--panel-2);
+    text-decoration: none;
+  }
+  .course .row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.72em;
+  }
+  .course .theme {
+    color: var(--accent);
+    background: rgba(217,119,87,0.1);
+    padding: 3px 9px; border-radius: 999px;
+    font-weight: 600; letter-spacing: 0.04em;
+  }
+  .course .theme.alt { color: var(--accent-2); background: rgba(93,138,168,0.1); }
+  .course .theme.ok { color: var(--accent-3); background: rgba(109,186,136,0.1); }
+  .course .when { color: var(--muted-2); font-feature-settings: "tnum"; }
+  .course h4 {
+    margin: 0 0 6px; font-size: 1rem;
+    font-weight: 600; line-height: 1.35;
+    letter-spacing: -0.005em;
+  }
+  .course p {
+    margin: 0; color: var(--muted);
+    font-size: 0.86em; line-height: 1.5;
+    flex: 1;
+  }
+  .course .footer-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 0.78em;
+  }
+  .course .stars { color: var(--muted-2); }
+  .course .stars b { color: var(--accent); font-weight: 600; }
+  .course .arrow { color: var(--accent); }
+  @media (max-width: 900px) { .course-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .course-grid { grid-template-columns: 1fr; } }
+
   /* ======== MORE ======== */
   .more {
     background: var(--panel);
@@ -323,8 +380,9 @@
     <div class="brand">supachai-j <span class="dot">·</span> github.io</div>
     <div class="links">
       <a href="#about" class="hide-sm">About</a>
-      <a href="#work">Work</a>
-      <a href="#contact">Contact</a>
+      <a href="#work">Featured</a>
+      <a href="#courses">Courses</a>
+      <a href="#contact" class="hide-sm">Contact</a>
       <a href="https://github.com/supachai-j">GitHub ↗</a>
     </div>
   </div>
@@ -415,12 +473,139 @@
   </a>
 </section>
 
+<!-- ============= COURSES & WORKSHOPS ============= -->
+<section class="block" id="courses">
+  <span class="section-label">Courses &amp; workshops</span>
+  <h2 class="section-title">Recent training material</h2>
+
+  <div class="course-grid">
+
+    <a class="course" href="https://github.com/supachai-j/oracle-ebook">
+      <div class="row">
+        <span class="theme alt">Oracle · Thai</span>
+        <span class="when">2026-04</span>
+      </div>
+      <h4>Oracle 101 Ebook</h4>
+      <p>Thai-language starter kit prepared for the arra-oracle unconference. Foundations of Oracle, written for Thai readers.</p>
+      <div class="footer-row">
+        <span class="stars">📘 ebook</span>
+        <span class="arrow">repo →</span>
+      </div>
+    </a>
+
+    <a class="course" href="https://github.com/supachai-j/basic-openclaw-workshop-1day">
+      <div class="row">
+        <span class="theme">AppSec</span>
+        <span class="when">2026-04</span>
+      </div>
+      <h4>OpenClaw Workshop · 1 Day</h4>
+      <p>One-day hands-on workshop on OpenClaw — application security fundamentals through a deliberately broken target.</p>
+      <div class="footer-row">
+        <span class="stars">🛡️ workshop</span>
+        <span class="arrow">repo →</span>
+      </div>
+    </a>
+
+    <a class="course" href="https://github.com/supachai-j/basic-k8s-workshop-training-1day">
+      <div class="row">
+        <span class="theme ok">Kubernetes</span>
+        <span class="when">2026-04</span>
+      </div>
+      <h4>Basic Kubernetes Workshop · 1 Day</h4>
+      <p>One-day, hands-on K8s workshop — from container fundamentals to your first deployments and services.</p>
+      <div class="footer-row">
+        <span class="stars">⎈ workshop</span>
+        <span class="arrow">repo →</span>
+      </div>
+    </a>
+
+    <a class="course" href="https://github.com/supachai-j/certified-kubernetes-administrator-course-thai">
+      <div class="row">
+        <span class="theme ok">CKA · Thai</span>
+        <span class="when">2026-04</span>
+      </div>
+      <h4>CKA Course (Thai)</h4>
+      <p>Certified Kubernetes Administrator preparation — the entire syllabus broken down for Thai-speaking engineers.</p>
+      <div class="footer-row">
+        <span class="stars">🎓 cert prep</span>
+        <span class="arrow">repo →</span>
+      </div>
+    </a>
+
+    <a class="course" href="https://github.com/supachai-j/kubernetes-playgrounds">
+      <div class="row">
+        <span class="theme ok">Kubernetes</span>
+        <span class="when">2026-03</span>
+      </div>
+      <h4>Kubernetes Playgrounds</h4>
+      <p>Bite-sized self-contained labs for K8s concepts — RBAC, networking, storage, scheduling, you name it.</p>
+      <div class="footer-row">
+        <span class="stars">🧪 labs</span>
+        <span class="arrow">repo →</span>
+      </div>
+    </a>
+
+    <a class="course" href="https://github.com/supachai-j/terraform-beginners-training">
+      <div class="row">
+        <span class="theme">Terraform · IaC</span>
+        <span class="when">2025-08</span>
+      </div>
+      <h4>Terraform for Beginners</h4>
+      <p>Step-by-step labs to learn Terraform from zero — providers, state, modules, and a path to multi-environment infra.</p>
+      <div class="footer-row">
+        <span class="stars"><b>★3</b> · 🧱 IaC labs</span>
+        <span class="arrow">repo →</span>
+      </div>
+    </a>
+
+    <a class="course" href="https://github.com/supachai-j/envoy-proxy-fundamentals-workshop">
+      <div class="row">
+        <span class="theme alt">Envoy · Proxy</span>
+        <span class="when">2023-01</span>
+      </div>
+      <h4>Envoy Fundamentals Workshop</h4>
+      <p>Hands-on intro to Envoy proxy — listeners, routes, clusters, and a tour of what powers most modern service meshes.</p>
+      <div class="footer-row">
+        <span class="stars">🚦 workshop</span>
+        <span class="arrow">repo →</span>
+      </div>
+    </a>
+
+    <a class="course" href="https://github.com/supachai-j/f5-distributed-cloud-101-workshop-thai">
+      <div class="row">
+        <span class="theme alt">F5 · Thai</span>
+        <span class="when">2022-12</span>
+      </div>
+      <h4>F5 Distributed Cloud 101</h4>
+      <p>Thai-language workshop on F5's Distributed Cloud platform — multi-cloud networking and security 101.</p>
+      <div class="footer-row">
+        <span class="stars">☁️ workshop</span>
+        <span class="arrow">repo →</span>
+      </div>
+    </a>
+
+    <a class="course" href="https://github.com/supachai-j/nginx-basic-course-training-part1">
+      <div class="row">
+        <span class="theme">NGINX · Thai</span>
+        <span class="when">2021-09</span>
+      </div>
+      <h4>NGINX Basic Course (Part 1+2)</h4>
+      <p>Two-part NGINX training in Thai — from the first config block to load balancing, caching, and reverse proxy patterns.</p>
+      <div class="footer-row">
+        <span class="stars">📚 course series</span>
+        <span class="arrow">repo →</span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
 <!-- ============= MORE ============= -->
 <section class="block">
   <div class="more">
     <p>
-      <strong>More projects:</strong>
-      Kubernetes workshops · CKA Thai course · Oracle 101 ebook · cloud-native security labs · 130+ more →
+      <strong>And more:</strong>
+      F5 BIG-IP demos · Ansible hands-on · NGINX automation · API security labs · 130+ public repos →
     </p>
     <a class="btn ghost" href="https://github.com/supachai-j?tab=repositories">Browse all on GitHub</a>
   </div>
