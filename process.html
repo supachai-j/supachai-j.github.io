@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>How I build courses — 12-phase pipeline · Supachai Jaturaprom</title>
+<meta name="description" content="The 12-phase pipeline I use to build bilingual self-paced training courses — from scope through deploy. Plus the template repo and skill that automate it." />
+<meta name="theme-color" content="#0b0d12" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#fafbfc" media="(prefers-color-scheme: light)" />
+<script>
+  (function() {
+    try {
+      var stored = localStorage.getItem('theme');
+      var theme = stored || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+      document.documentElement.dataset.theme = theme;
+    } catch (e) { document.documentElement.dataset.theme = 'dark'; }
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root, [data-theme="dark"] {
+    --bg: #0b0d12; --bg-2: #0f1116;
+    --panel: #161922; --panel-2: #1c2030;
+    --accent: #d97757; --accent-glow: rgba(217,119,87,0.35); --accent-on: #1a0f08;
+    --accent-2: #5d8aa8; --accent-3: #6dba88;
+    --muted: #8a93a3; --muted-2: #5d6371;
+    --text: #e8ecf2;
+    --border: rgba(255,255,255,0.06); --border-2: rgba(255,255,255,0.10);
+    --code-bg: #11141a; --code-text: #d8e0eb;
+    --soft-1: rgba(255,255,255,0.04); --soft-2: rgba(255,255,255,0.08);
+    --nav-bg: rgba(11,13,18,0.85);
+  }
+  [data-theme="light"] {
+    --bg: #fafbfc; --bg-2: #ffffff;
+    --panel: #ffffff; --panel-2: #f4f6fa;
+    --accent: #c95a30; --accent-glow: rgba(201,90,48,0.22); --accent-on: #ffffff;
+    --accent-2: #2f6494; --accent-3: #3e8e5e;
+    --muted: #58607a; --muted-2: #7a8298;
+    --text: #1a1d27;
+    --border: rgba(0,0,0,0.08); --border-2: rgba(0,0,0,0.14);
+    --code-bg: #f4f6fa; --code-text: #1a1d27;
+    --soft-1: rgba(0,0,0,0.03); --soft-2: rgba(0,0,0,0.06);
+    --nav-bg: rgba(255,255,255,0.85);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Inter","Noto Sans Thai",system-ui,sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.65;
+    transition: background-color .25s ease, color .25s ease; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: "JetBrains Mono","Menlo",monospace; font-size: 0.9em;
+    background: rgba(217,119,87,0.12); padding: 1px 6px; border-radius: 4px; }
+  pre { background: var(--code-bg); border: 1px solid var(--border);
+    border-left: 3px solid var(--accent); padding: 16px 18px;
+    border-radius: 8px; overflow-x: auto; font-size: 0.85em; line-height: 1.55;
+    color: var(--code-text); margin: 16px 0; }
+  pre code { background: none; padding: 0; font-size: inherit; color: inherit; }
+
+  /* nav */
+  nav.top { position: sticky; top: 0; z-index: 50;
+    background: var(--nav-bg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border); transition: background-color .25s, border-color .25s; }
+  nav.top .inner { max-width: 1100px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between; }
+  nav.top .brand { font-weight: 700; font-size: 0.95em; }
+  nav.top .brand .dot { color: var(--accent); }
+  nav.top .links { display: flex; gap: 22px; align-items: center; font-size: 0.88em; }
+  nav.top .links a { color: var(--muted); }
+  nav.top .links a:hover { color: var(--text); text-decoration: none; }
+
+  .theme-toggle { background: var(--soft-1); border: 1px solid var(--border);
+    color: var(--muted); width: 34px; height: 34px; border-radius: 8px;
+    display: inline-grid; place-items: center; cursor: pointer; padding: 0;
+    transition: background-color .15s, color .15s, border-color .15s; }
+  .theme-toggle:hover { background: var(--soft-2); color: var(--text); border-color: var(--border-2); }
+  .theme-toggle svg { width: 16px; height: 16px; display: block; }
+  .theme-toggle .icon-moon { display: none; }
+  [data-theme="light"] .theme-toggle .icon-sun { display: none; }
+  [data-theme="light"] .theme-toggle .icon-moon { display: block; }
+
+  /* layout: main column with optional sticky aside on wide screens */
+  .layout { max-width: 980px; margin: 0 auto; padding: 0 24px; display: grid;
+    grid-template-columns: 1fr; gap: 0; }
+
+  header.page-head { padding: 80px 0 48px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+  header.page-head .pill { display: inline-block; padding: 4px 12px; border-radius: 999px;
+    background: rgba(217,119,87,0.15); color: var(--accent);
+    font-size: 0.72em; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 18px; }
+  header.page-head h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800; margin: 0 0 14px; line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+  header.page-head .lede { color: var(--muted); margin: 0 0 18px; max-width: 720px; font-size: 1.1em; line-height: 1.6; }
+  header.page-head .lede.h-th { color: var(--muted-2); font-size: 1em; }
+  header.page-head .meta-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px; font-size: 0.88em; color: var(--muted-2); }
+  header.page-head .meta-row span { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* pipeline visual */
+  .pipeline-vis {
+    background: linear-gradient(135deg, rgba(217,119,87,0.06), rgba(93,138,168,0.06));
+    border: 1px solid var(--border-2);
+    border-radius: 16px;
+    padding: 28px 24px;
+    margin: 32px 0 56px;
+    overflow-x: auto;
+  }
+  .pipeline-vis pre { background: transparent; border: none; padding: 0; margin: 0;
+    color: var(--text); font-size: 0.85em; line-height: 1.55; white-space: pre; }
+
+  section.phase {
+    margin: 56px 0; scroll-margin-top: 16px;
+    background: var(--panel); border: 1px solid var(--border);
+    border-radius: 14px; padding: 32px 32px 28px;
+  }
+  section.phase header { margin-bottom: 18px; }
+  section.phase header .phase-num {
+    display: inline-block; font-feature-settings: "tnum";
+    color: var(--accent); font-weight: 700; font-size: 0.8em;
+    letter-spacing: 0.16em; text-transform: uppercase; margin-right: 12px;
+  }
+  section.phase header .time-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 999px;
+    background: var(--soft-1); border: 1px solid var(--border);
+    font-size: 0.72em; color: var(--muted); font-feature-settings: "tnum";
+  }
+  section.phase header h2 { font-size: 1.55rem; font-weight: 700; margin: 8px 0 6px; letter-spacing: -0.01em; }
+  section.phase header .summary { color: var(--muted); margin: 0; font-size: 1em; }
+
+  section.phase .grid-2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px; align-items: start; margin-top: 18px; }
+  @media (max-width: 720px) { section.phase .grid-2 { grid-template-columns: 1fr; } }
+
+  section.phase .body p { margin: 8px 0; color: var(--muted); }
+  section.phase .body p strong { color: var(--text); }
+  section.phase .body ul, section.phase .body ol { color: var(--muted); margin: 8px 0; padding-left: 22px; }
+  section.phase .body li { margin: 4px 0; }
+  section.phase .body li strong { color: var(--text); }
+
+  section.phase .meta-card {
+    background: var(--bg-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px; font-size: 0.88em;
+  }
+  section.phase .meta-card h4 {
+    margin: 0 0 8px; color: var(--accent);
+    font-size: 0.72em; letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  section.phase .meta-card .field { margin: 6px 0; color: var(--muted); }
+  section.phase .meta-card .field strong { color: var(--text); }
+
+  .gate {
+    background: rgba(109,186,136,0.08);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 14px; font-size: 0.92em;
+  }
+  .gate strong { color: var(--accent-3); }
+
+  /* tables for fast-path */
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.92em; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--accent); font-weight: 600; font-size: 0.82em; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* artifact cards */
+  .artifact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+  .artifact { background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 22px; color: var(--text); text-decoration: none;
+    transition: transform .12s, border-color .12s, background .12s; display: block; }
+  .artifact:hover { transform: translateY(-2px); border-color: var(--accent); background: var(--panel-2); text-decoration: none; }
+  .artifact .label { color: var(--accent); font-size: 0.72em; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; }
+  .artifact h3 { margin: 6px 0; font-size: 1.1rem; font-weight: 600; }
+  .artifact p { margin: 0 0 10px; color: var(--muted); font-size: 0.9em; line-height: 1.5; }
+  .artifact .arrow { color: var(--accent); font-size: 0.85em; }
+  @media (max-width: 600px) { .artifact-grid { grid-template-columns: 1fr; } }
+
+  .section-label { display: inline-block; color: var(--accent); font-size: 0.78em;
+    letter-spacing: 0.16em; text-transform: uppercase; font-weight: 600; margin-bottom: 12px; }
+  h2.section-title { font-size: 1.6rem; font-weight: 700; margin: 0 0 14px; letter-spacing: -0.01em; }
+
+  .block { padding: 56px 0; }
+
+  footer { max-width: 980px; margin: 32px auto 60px; padding: 24px;
+    color: var(--muted-2); font-size: 0.85em; text-align: center;
+    border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="inner">
+    <div class="brand">supachai-j <span class="dot">·</span> github.io</div>
+    <div class="links">
+      <a href="index.html">Home</a>
+      <a href="index.html#work">Featured</a>
+      <a href="index.html#courses">Courses</a>
+      <a href="index.html#writing">Writing</a>
+      <a href="https://github.com/supachai-j">GitHub ↗</a>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/>
+          <path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/>
+          <path d="M2 12h2"/><path d="M20 12h2"/>
+          <path d="m4.93 19.07 1.41-1.41"/><path d="m17.66 6.34 1.41-1.41"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="layout">
+
+<header class="page-head">
+  <span class="pill">Process · How I work</span>
+  <h1>How I build courses — a 12-phase pipeline</h1>
+  <p class="lede">A reusable, opinionated workflow for producing bilingual (EN/TH) self-paced training courses with wiki-backed citations, instructor slide decks, and a marketing landing page — deployable in 30 minutes.</p>
+  <p class="lede h-th">กระบวนการทำหลักสูตรสองภาษาที่ผมตกผลึกจากการสร้าง Agent Skills 101 และนำกลับมาใช้ซ้ำได้</p>
+  <div class="meta-row">
+    <span>📅 Distilled May 2026</span>
+    <span>⏱ 20-30 h bilingual / 6-8 h fast path</span>
+    <span>🛠 Template + Skill + this doc</span>
+  </div>
+</header>
+
+<!-- Pipeline visual -->
+<div class="pipeline-vis">
+<pre>   Phase 1-2          Phase 3-5            Phase 6-8           Phase 9-10        Phase 11-12
+  ┌────────┐        ┌──────────┐         ┌──────────┐        ┌──────────┐      ┌──────────┐
+  │ Decide │ ──→    │  Wiki +  │  ──→    │  Course +│  ──→   │ Landing +│ ──→  │ Validate │
+  │ Research        │  Outline │         │  Slides  │        │  Deploy  │      │ Promote  │
+  └────────┘        └──────────┘         └──────────┘        └──────────┘      └──────────┘
+   ~30m+2h            ~3-4h                ~5-8h               ~1h+30m            ~1-2h
+   single             single                bilingual          deploy             team test</pre>
+</div>
+
+<!-- Phases -->
+<section id="p1" class="phase">
+  <header>
+    <div><span class="phase-num">Phase 01</span><span class="time-badge">~30 min</span></div>
+    <h2>Scope</h2>
+    <p class="summary">Before writing anything — commit a <code>scope.md</code> with four answers.</p>
+  </header>
+  <div class="grid-2">
+    <div class="body">
+      <ol>
+        <li><strong>One-sentence outcome:</strong> "After this, the reader will be able to ____."</li>
+        <li><strong>Audience:</strong> Junior? Tech lead? Specific role?</li>
+        <li><strong>Format:</strong> Self-paced / 1-day workshop / course series</li>
+        <li><strong>Time budget:</strong> 30 min / 2 h / 8 h?</li>
+      </ol>
+      <p>If you can't write all four in 30 minutes, the topic isn't ready. Don't proceed.</p>
+    </div>
+    <div class="meta-card">
+      <h4>Output</h4>
+      <p class="field"><strong>scope.md</strong> committed</p>
+      <h4 style="margin-top:14px">Tools</h4>
+      <p class="field">your favourite editor</p>
+    </div>
+  </div>
+  <div class="gate"><strong>Done when:</strong> scope.md exists with all four answers.</div>
+</section>
+
+<section id="p2" class="phase">
+  <header>
+    <div><span class="phase-num">Phase 02</span><span class="time-badge">~2-4 h</span></div>
+    <h2>Research &amp; capture</h2>
+    <p class="summary">Find 3-5 <strong>primary sources</strong> — official docs, engineering blogs, formal specs.</p>
+  </header>
+  <div class="grid-2">
+    <div class="body">
+      <p>Avoid "5 best ways to..." aggregator articles. You want the canonical source so your wiki claims have authority.</p>
+      <p>Save each source <strong>verbatim</strong> as <code>raw/YYYY-MM-DD-&lt;slug&gt;.md</code> with frontmatter:</p>
+      <pre><code>---
+source_type: web | doc | transcript
+source_url: https://...
+ingested_at: YYYY-MM-DD
+title: &lt;verbatim title&gt;
+---</code></pre>
+      <p><strong>Filter secrets</strong> before saving — replace tokens with <code>&lt;REDACTED:kind&gt;</code>.</p>
+    </div>
+    <div class="meta-card">
+      <h4>Output</h4>
+      <p class="field">≥3 files in <strong>raw/</strong></p>
+      <h4 style="margin-top:14px">Tools</h4>
+      <p class="field">WebFetch · curl · pandoc</p>
+    </div>
+  </div>
+  <div class="gate"><strong>Done when:</strong> ≥3 raw files exist, each with valid frontmatter, captured verbatim.</div>
+</section>
+
+<section id="p3" class="phase">
+  <header>
+    <div><span class="phase-num">Phase 03</span><span class="time-badge">~30 min</span></div>
+    <h2>Wiki init</h2>
+    <p class="summary">Customise <code>SCHEMA.md</code> for your domain.</p>
+  </header>
+  <div class="grid-2">
+    <div class="body">
+      <ul>
+        <li><strong>Entity types:</strong> add domain-specific (Kubernetes → <code>resource</code>, <code>controller</code>; Agent Skills → <code>skill</code>, <code>concept</code>).</li>
+        <li><strong>Relations:</strong> keep the set small — <code>uses</code>, <code>depends-on</code>, <code>composes</code>, <code>alternative-to</code>, <code>supersedes</code>.</li>
+        <li><strong>Half-life:</strong> shorten if the domain changes fast. JS frameworks: 90 days. Linux fundamentals: 365 days.</li>
+      </ul>
+    </div>
+    <div class="meta-card">
+      <h4>Output</h4>
+      <p class="field">Customised <strong>SCHEMA.md</strong></p>
+      <h4 style="margin-top:14px">Template</h4>
+      <p class="field"><a href="https://github.com/supachai-j/course-portal-template/blob/main/SCHEMA.md">SCHEMA.md →</a></p>
+    </div>
+  </div>
+  <div class="gate"><strong>Done when:</strong> SCHEMA.md reflects your domain, not the generic template.</div>
+</section>
+
+<section id="p4" class="phase">
+  <header>
+    <div><span class="phase-num">Phase 04</span><span class="time-badge">~2-3 h</span></div>
+    <h2>Ingest</h2>
+    <p class="summary">Turn raw sources into wiki pages with citations.</p>
+  </header>
+  <div class="grid-2">
+    <div class="body">
+      <p>For each entity in raw: decide new vs update. New entities → <code>wiki/&lt;type&gt;:&lt;slug&gt;.md</code>. Every claim cites raw + has confidence:</p>
+      <pre><code>- &lt;Claim.&gt; `[src: raw/2026-05-08-source.md] {conf: 0.5}`</code></pre>
+      <p>Reinforcement formula: <code>conf ← 1 - (1 - conf) × 0.6</code></p>
+      <p>Update <code>graph/entities.jsonl</code> + <code>graph/edges.jsonl</code> as you go.</p>
+      <p>Rule of thumb: ~10-15 wiki pages per 12-module course.</p>
+    </div>
+    <div class="meta-card">
+      <h4>Output</h4>
+      <p class="field">Cited wiki pages + graph</p>
+      <h4 style="margin-top:14px">Tools</h4>
+      <p class="field">Claude with <a href="https://github.com/supachai-j/agent-skills-training/tree/main/.agents/skills/scaffolding-course-portal">course-portal skill</a></p>
+    </div>
+  </div>
+  <div class="gate"><strong>Done when:</strong> every claim has citation + confidence, wiki-index.md lists every page.</div>
+</section>
+
+<section id="p5" class="phase">
+  <header>
+    <div><span class="phase-num">Phase 05</span><span class="time-badge">~1 h</span></div>
+    <h2>Outline</h2>
+    <p class="summary">Draft 10-12 modules. Every module must cite ≥1 wiki page.</p>
+  </header>
+  <div class="grid-2">
+    <div class="body">
+      <p>If a module has nothing to cite, the domain isn't ready — go back to Phase 4.</p>
+      <p>Pattern that works:</p>
+      <ol>
+        <li>Welcome &amp; what you'll learn</li>
+        <li>Definition &amp; analogy</li>
+        <li>Anatomy / contract</li>
+        <li>Core mechanism</li>
+        <li>Ecosystem / where it fits</li>
+        <li>Surfaces / variants</li>
+        <li>vs alternatives (decision framework)</li>
+        <li>Best practices</li>
+        <li>Lab / hands-on</li>
+        <li>Implementation guide</li>
+        <li>Security &amp; rollout</li>
+        <li>Cheatsheet &amp; resources</li>
+      </ol>
+    </div>
+    <div class="meta-card">
+      <h4>Output</h4>
+      <p class="field"><strong>outline.md</strong> with module → wiki page mapping</p>
+    </div>
+  </div>
+  <div class="gate"><strong>Done when:</strong> every module maps to at least one wiki page.</div>
+</section>
+
+<section id="p6" class="phase">
+  <header>
+    <div><span class="phase-num">Phase 06</span><span class="time-badge">~3-5 h</span></div>
+    <h2>Course pages</h2>
+    <p class="summary">Fill in <code>course-en.html</code> — long-form, single-file, sticky-sidebar TOC.</p>
+  </header>
+  <div class="grid-2">
+    <div class="body">
+      <p>Each module structure:</p>
+      <ul>
+        <li>Number + title + 1-sentence summary</li>
+        <li>2-3 paragraphs of body</li>
+        <li>1-2 code blocks or examples</li>
+        <li>1 callout (Takeaway / Lab / Note)</li>
+      </ul>
+      <p>Internal anchors (<code>#m1</code>, <code>#m2</code>...) so the sidebar TOC works.</p>
+    </div>
+    <div class="meta-card">
+      <h4>Output</h4>
+      <p class="field"><strong>course-en.html</strong></p>
+      <h4 style="margin-top:14px">Theme</h4>
+      <p class="field">Dark/light toggle, Inter + JetBrains Mono</p>
+    </div>
+  </div>
+  <div class="gate"><strong>Done when:</strong> every anchor resolves, every wiki citation valid.</div>
+</section>
+
+<section id="p7" class="phase">
+  <header>
+    <div><span class="phase-num">Phase 07</span><span class="time-badge">~2-3 h</span></div>
+    <h2>Slide deck</h2>
+    <p class="summary">~30-35 reveal.js slides condensing the course.</p>
+  </header>
+  <div class="grid-2">
+    <div class="body">
+      <p>Density rules I learned the hard way:</p>
+      <ul>
+        <li>Max <strong>6 bullets</strong> per slide</li>
+        <li>Max <strong>15 lines of code</strong> per slide</li>
+        <li>Max <strong>5 columns × 5 rows</strong> per table</li>
+        <li>Use canvas <code>1280 × 800</code> — <strong>not</strong> reveal.js's default <code>960 × 700</code>. Default crops content.</li>
+      </ul>
+      <pre><code>Reveal.initialize({
+  width: 1280, height: 800,
+  margin: 0.06,
+  minScale: 0.2, maxScale: 1.8,
+  ...
+});</code></pre>
+    </div>
+    <div class="meta-card">
+      <h4>Output</h4>
+      <p class="field"><strong>slides/training-en.html</strong></p>
+    </div>
+  </div>
+  <div class="gate"><strong>Done when:</strong> no slide overflows the canvas when projected.</div>
+</section>
+
+<section id="p8" class="phase">
+  <header>
+    <div><span class="phase-num">Phase 08</span><span class="time-badge">~3-4 h · optional</span></div>
+    <h2>Bilingual mirror</h2>
+    <p class="summary">Mirror EN → TH (or skip for fast path).</p>
+  </header>
+  <div class="grid-2">
+    <div class="body">
+      <p>Rules that work in production:</p>
+      <ul>
+        <li><strong>Code blocks stay in English</strong> — never translate identifiers.</li>
+        <li><strong>Technical English terms preserved</strong> in <code>&lt;code&gt;</code> or <code>&lt;span class="term-en"&gt;</code>.</li>
+        <li><strong>Line-height 1.7</strong> for Thai (1.65 for English) — Thai script has top/bottom marks.</li>
+        <li><strong>Font:</strong> Noto Sans Thai first, then Inter.</li>
+      </ul>
+    </div>
+    <div class="meta-card">
+      <h4>Output</h4>
+      <p class="field"><strong>course-th.html</strong> + slides</p>
+    </div>
+  </div>
+  <div class="gate"><strong>Done when:</strong> TH structure mirrors EN, language flows naturally.</div>
+</section>
+
+<section id="p9" class="phase">
+  <header>
+    <div><span class="phase-num">Phase 09</span><span class="time-badge">~1-2 h</span></div>
+    <h2>Landing page tuning</h2>
+    <p class="summary">Polish <code>index.html</code> — marketing, not "training portal".</p>
+  </header>
+  <div class="grid-2">
+    <div class="body">
+      <p>The 8 sections that work:</p>
+      <ol>
+        <li>Sticky nav + theme toggle + primary CTA</li>
+        <li>Hero with gradient blur, animated badge, bilingual title, 2-3 CTAs</li>
+        <li>Stats bar (4 numbers building credibility)</li>
+        <li>Why (before/after 2-col)</li>
+        <li>What you'll learn (3-col, 6 cards)</li>
+        <li>Code/visual preview (real example)</li>
+        <li>How it works (3-tier diagram of core mechanism)</li>
+        <li>Get started → Final CTA → Footer</li>
+      </ol>
+    </div>
+    <div class="meta-card">
+      <h4>Output</h4>
+      <p class="field">Polished <strong>index.html</strong></p>
+    </div>
+  </div>
+  <div class="gate"><strong>Done when:</strong> light + dark modes both polished, responsive at 375px.</div>
+</section>
+
+<section id="p10" class="phase">
+  <header>
+    <div><span class="phase-num">Phase 10</span><span class="time-badge">~30 min</span></div>
+    <h2>Deploy</h2>
+    <p class="summary">One-shot deploy to GitHub Pages.</p>
+  </header>
+  <div class="grid-2">
+    <div class="body">
+      <pre><code>git init -b main
+echo ".DS_Store" &gt; .gitignore
+touch .nojekyll
+git add . &amp;&amp; git commit -m "Initial: &lt;course&gt;"
+gh repo create your-org/&lt;repo&gt; --public --source=. --push
+gh api -X POST /repos/your-org/&lt;repo&gt;/pages \
+  -f "build_type=legacy" \
+  -f "source[branch]=main" \
+  -f "source[path]=/"
+sleep 30
+curl -I https://your-org.github.io/&lt;repo&gt;/</code></pre>
+      <p><code>.nojekyll</code> is critical — without it, Pages chokes on filenames containing colons (your wiki uses them).</p>
+    </div>
+    <div class="meta-card">
+      <h4>Output</h4>
+      <p class="field">Live URL returning 200</p>
+    </div>
+  </div>
+  <div class="gate"><strong>Done when:</strong> all entry-point URLs return HTTP 200.</div>
+</section>
+
+<section id="p11" class="phase">
+  <header>
+    <div><span class="phase-num">Phase 11</span><span class="time-badge">~1-2 h</span></div>
+    <h2>Validate</h2>
+    <p class="summary">Friction tests with real readers, not your imagination.</p>
+  </header>
+  <div class="grid-2">
+    <div class="body">
+      <ul>
+        <li><strong>Internal links:</strong> grep + curl every <code>href</code></li>
+        <li><strong>Mobile responsive:</strong> DevTools 375px width</li>
+        <li><strong>Theme toggle:</strong> click sun/moon, scroll every section</li>
+        <li><strong>Reading flow:</strong> hand to one peer + one junior, observe friction in the first 30 minutes</li>
+        <li><strong>Citations:</strong> spot-check 5 quotes against wiki/raw</li>
+      </ul>
+    </div>
+    <div class="meta-card">
+      <h4>Output</h4>
+      <p class="field">Feedback notes + fix list</p>
+    </div>
+  </div>
+  <div class="gate"><strong>Done when:</strong> ≥3 rounds of feedback incorporated.</div>
+</section>
+
+<section id="p12" class="phase">
+  <header>
+    <div><span class="phase-num">Phase 12</span><span class="time-badge">~1 h</span></div>
+    <h2>Promote</h2>
+    <p class="summary">Make it findable.</p>
+  </header>
+  <div class="grid-2">
+    <div class="body">
+      <ul>
+        <li>Featured/Courses card on the personal hub</li>
+        <li>Blog post: "What I learned writing X" (~600 words)</li>
+        <li>Repo description + topics</li>
+        <li>Tweet / Medium</li>
+      </ul>
+    </div>
+    <div class="meta-card">
+      <h4>Output</h4>
+      <p class="field">Hub updated, draft post in repo</p>
+    </div>
+  </div>
+  <div class="gate"><strong>Done when:</strong> hub Featured/Courses card live, blog post drafted.</div>
+</section>
+
+<!-- ============= FAST PATH ============= -->
+<section class="block">
+  <span class="section-label">Fast path</span>
+  <h2 class="section-title">When you can't spare 25 hours</h2>
+  <p style="color: var(--muted); margin: 0 0 18px;">EN-only solo author shipping in a weekend.</p>
+  <table>
+    <thead><tr><th>Phase</th><th>Skip?</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td>1-5</td><td style="color:#e25555">❌ never</td><td>Scope/sources/outline are the foundation</td></tr>
+      <tr><td>6</td><td style="color:var(--accent-3)">✅ trim to 6-8 modules</td><td>Cut security/implementation guide</td></tr>
+      <tr><td>7</td><td>⚠️ optional</td><td>Skip if not running live sessions</td></tr>
+      <tr><td>8</td><td style="color:var(--accent-3)">✅ skip</td><td>Add TH later</td></tr>
+      <tr><td>9</td><td>⚠️ minimal</td><td>Hero + cards only</td></tr>
+      <tr><td>10-11</td><td style="color:#e25555">❌ never</td><td>Deploy + validate are quality gates</td></tr>
+      <tr><td>12</td><td>⚠️ optional</td><td>Promote later</td></tr>
+    </tbody>
+  </table>
+  <p style="color: var(--muted-2); margin-top: 12px; font-size: 0.92em;">Total fast path: ~6-8 h.</p>
+</section>
+
+<!-- ============= ARTIFACTS ============= -->
+<section class="block" id="artifacts">
+  <span class="section-label">The artifacts</span>
+  <h2 class="section-title">Use them, don't reinvent them</h2>
+  <p style="color: var(--muted); margin: 0 0 24px;">This pipeline ships with three reusable artifacts. Pick whichever fits your starting point.</p>
+
+  <div class="artifact-grid">
+    <a class="artifact" href="https://github.com/supachai-j/course-portal-template">
+      <div class="label">Template repo</div>
+      <h3>course-portal-template</h3>
+      <p>Click "Use this template" on GitHub, run <code>./setup.sh</code>, fill in tokens. Phase 3, 6, 7, 9 already scaffolded.</p>
+      <span class="arrow">github.com/supachai-j/course-portal-template ↗</span>
+    </a>
+    <a class="artifact" href="https://github.com/supachai-j/agent-skills-training/tree/main/.agents/skills/scaffolding-course-portal">
+      <div class="label">Agent Skill</div>
+      <h3>scaffolding-course-portal</h3>
+      <p>SKILL.md following the agentskills.io open standard. Use in Claude Code, Cursor, Copilot, etc. — works anywhere SKILL.md is supported.</p>
+      <span class="arrow">github.com/supachai-j/agent-skills-training/.agents/skills ↗</span>
+    </a>
+    <a class="artifact" href="https://supachai-j.github.io/agent-skills-training/" style="grid-column: 1 / -1;">
+      <div class="label">Worked example</div>
+      <h3>Agent Skills 101</h3>
+      <p>The course this pipeline was extracted from. Bilingual landing + course pages + slide decks + 17-page cited wiki, all live.</p>
+      <span class="arrow">supachai-j.github.io/agent-skills-training ↗</span>
+    </a>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <p>Distilled May 2026 from <a href="https://github.com/supachai-j/agent-skills-training">agent-skills-training</a> · <a href="index.html">← back to hub</a></p>
+</footer>
+
+<script>
+  (function() {
+    var btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    btn.addEventListener('click', function() {
+      var current = document.documentElement.dataset.theme || 'dark';
+      var next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem('theme', next); } catch (e) {}
+    });
+    var mq = window.matchMedia('(prefers-color-scheme: light)');
+    if (mq.addEventListener) {
+      mq.addEventListener('change', function(e) {
+        if (!localStorage.getItem('theme')) {
+          document.documentElement.dataset.theme = e.matches ? 'light' : 'dark';
+        }
+      });
+    }
+  })();
+</script>
+</body>
+</html>
