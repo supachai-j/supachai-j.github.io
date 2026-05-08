@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Supachai Jaturaprom — Engineer · Educator · Bangkok</title>
+<meta name="description" content="Personal hub of Supachai Jaturaprom (supachai-j) — engineer and educator in Bangkok. Building training material on AI agents, Kubernetes, and modern infra." />
+<meta property="og:title" content="Supachai Jaturaprom" />
+<meta property="og:description" content="Engineer · Educator · Bangkok. Training material on AI agents, Kubernetes, and modern infra." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://supachai-j.github.io/" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg: #0b0d12;
+    --bg-2: #0f1116;
+    --panel: #161922;
+    --panel-2: #1c2030;
+    --accent: #d97757;
+    --accent-glow: rgba(217,119,87,0.35);
+    --accent-2: #5d8aa8;
+    --accent-3: #6dba88;
+    --muted: #8a93a3;
+    --muted-2: #5d6371;
+    --text: #e8ecf2;
+    --border: rgba(255,255,255,0.06);
+    --border-2: rgba(255,255,255,0.10);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Inter", "Noto Sans Thai", "Segoe UI", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+  a { color: var(--accent); text-decoration: none; transition: color .12s ease; }
+  a:hover { text-decoration: underline; }
+  code { font-family: "JetBrains Mono", "Menlo", monospace; }
+
+  /* ======== NAV ======== */
+  nav.top {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(11,13,18,0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav.top .inner {
+    max-width: 1100px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  nav.top .brand {
+    font-weight: 700; letter-spacing: -0.01em; font-size: 0.95em;
+    display: inline-flex; gap: 8px; align-items: center;
+  }
+  nav.top .brand .dot { color: var(--accent); }
+  nav.top .links { display: flex; gap: 22px; align-items: center; font-size: 0.88em; }
+  nav.top .links a { color: var(--muted); }
+  nav.top .links a:hover { color: var(--text); text-decoration: none; }
+  @media (max-width: 600px) {
+    nav.top .links { gap: 14px; }
+    nav.top .links .hide-sm { display: none; }
+  }
+
+  /* ======== HERO ======== */
+  .hero { position: relative; padding: 120px 24px 80px; overflow: hidden; }
+  .hero::before {
+    content: "";
+    position: absolute; inset: -20% -20% 30% -20%;
+    background:
+      radial-gradient(ellipse 50% 40% at 25% 20%, rgba(217,119,87,0.18), transparent 60%),
+      radial-gradient(ellipse 50% 40% at 75% 30%, rgba(93,138,168,0.16), transparent 60%);
+    filter: blur(20px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero .inner { max-width: 880px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero .greeting {
+    color: var(--accent); font-size: 0.95em;
+    font-weight: 500; letter-spacing: 0.02em;
+    margin: 0 0 18px;
+    display: inline-flex; gap: 8px; align-items: center;
+  }
+  .hero .greeting .wave { display: inline-block; animation: wave 2.4s ease-in-out infinite; transform-origin: 70% 70%; }
+  @keyframes wave { 0%,40%,100% { transform: rotate(0); } 10% { transform: rotate(14deg); } 20% { transform: rotate(-8deg); } 30% { transform: rotate(14deg); } }
+  .hero h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin: 0 0 14px;
+    background: linear-gradient(180deg, #ffffff 30%, #b8c1d0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero .role {
+    font-size: clamp(1.2rem, 2.6vw, 1.7rem);
+    font-weight: 500;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+  .hero .role .accent {
+    color: var(--accent);
+    background: linear-gradient(135deg, #d97757, #e89e7a);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 600;
+  }
+  .hero .role-th {
+    color: var(--muted-2); font-size: 1rem;
+    margin: 0 0 30px;
+    font-family: "Noto Sans Thai", "Inter", sans-serif;
+  }
+  .hero .lede {
+    font-size: 1.1rem; color: var(--muted);
+    max-width: 640px; line-height: 1.7;
+    margin: 0 0 32px;
+  }
+  .hero .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 36px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 20px; border-radius: 10px;
+    font-weight: 600; font-size: 0.92em;
+    border: 1px solid transparent;
+    transition: transform .12s ease, background .12s ease, border-color .12s ease;
+  }
+  .btn:hover { text-decoration: none; transform: translateY(-1px); }
+  .btn.primary {
+    background: var(--accent); color: #1a0f08;
+    box-shadow: 0 8px 30px var(--accent-glow);
+  }
+  .btn.primary:hover { background: #e88563; }
+  .btn.ghost {
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+    border-color: var(--border-2);
+  }
+  .btn.ghost:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
+
+  .meta-strip {
+    display: flex; flex-wrap: wrap; gap: 18px;
+    color: var(--muted-2); font-size: 0.88em;
+  }
+  .meta-strip span { display: inline-flex; align-items: center; gap: 6px; }
+
+  /* ======== SECTION ======== */
+  section.block { max-width: 880px; margin: 0 auto; padding: 64px 24px; }
+  .section-label {
+    display: inline-block;
+    color: var(--accent); font-size: 0.78em;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    font-weight: 600; margin-bottom: 14px;
+  }
+  h2.section-title {
+    font-size: clamp(1.6rem, 3vw, 2rem);
+    font-weight: 700; letter-spacing: -0.02em;
+    margin: 0 0 18px; line-height: 1.2;
+  }
+
+  /* ======== ABOUT ======== */
+  .about p {
+    color: var(--muted); font-size: 1.05em;
+    margin: 0 0 16px; line-height: 1.75;
+  }
+  .about p strong { color: var(--text); }
+  .stack {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 20px;
+  }
+  .tag {
+    padding: 4px 12px; border-radius: 999px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--muted); font-size: 0.82em;
+    font-weight: 500;
+  }
+
+  /* ======== FEATURED PROJECT ======== */
+  .featured {
+    background: linear-gradient(135deg, rgba(217,119,87,0.08), rgba(93,138,168,0.08));
+    border: 1px solid var(--border-2);
+    border-radius: 18px;
+    padding: 36px 32px;
+    transition: transform .15s ease, border-color .15s ease;
+    display: block;
+    color: var(--text);
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .featured:hover { text-decoration: none; transform: translateY(-2px); border-color: rgba(217,119,87,0.4); }
+  .featured::before {
+    content: "";
+    position: absolute; top: 0; right: 0;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(217,119,87,0.15), transparent 70%);
+    pointer-events: none;
+  }
+  .featured > * { position: relative; }
+  .featured .meta {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px;
+    font-size: 0.78em;
+  }
+  .featured .pill {
+    padding: 3px 10px; border-radius: 999px;
+    background: rgba(217,119,87,0.18);
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    font-weight: 600;
+  }
+  .featured .meta .live {
+    color: var(--accent-3);
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .featured .meta .live::before {
+    content: ""; width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent-3); animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .featured h3 {
+    font-size: 1.55rem; margin: 0 0 6px; font-weight: 700;
+    letter-spacing: -0.015em;
+  }
+  .featured .h3-th {
+    color: var(--muted); margin: 0 0 16px;
+    font-size: 1rem; font-weight: 500;
+  }
+  .featured p.desc {
+    color: var(--muted); margin: 0 0 20px;
+    font-size: 0.98em; line-height: 1.65; max-width: 640px;
+  }
+  .featured .stats-row {
+    display: flex; flex-wrap: wrap; gap: 22px;
+    margin: 22px 0 24px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border-2);
+  }
+  .featured .stat .n {
+    font-size: 1.4rem; font-weight: 700; color: var(--accent);
+    font-feature-settings: "tnum";
+  }
+  .featured .stat .l { font-size: 0.8em; color: var(--muted); }
+  .featured .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .featured .actions a {
+    display: inline-block;
+    padding: 8px 14px; border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border-2);
+    font-size: 0.85em; font-weight: 500;
+    color: var(--text);
+  }
+  .featured .actions a:hover { background: rgba(217,119,87,0.12); border-color: rgba(217,119,87,0.4); text-decoration: none; }
+  .featured .actions a.go { background: var(--accent); color: #1a0f08; border-color: var(--accent); }
+  .featured .actions a.go:hover { background: #e88563; }
+
+  /* ======== MORE ======== */
+  .more {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 26px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 18px; flex-wrap: wrap;
+  }
+  .more p { margin: 0; color: var(--muted); }
+  .more p strong { color: var(--text); }
+
+  /* ======== CONTACT ======== */
+  .contact-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+  }
+  .contact-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color .12s, transform .12s, background .12s;
+  }
+  .contact-card:hover {
+    text-decoration: none;
+    transform: translateY(-2px);
+    border-color: rgba(217,119,87,0.3);
+    background: var(--panel-2);
+  }
+  .contact-card .platform {
+    color: var(--muted); font-size: 0.78em;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  .contact-card .handle { font-weight: 600; font-size: 1.05em; }
+  .contact-card .arrow { color: var(--accent); font-size: 0.85em; margin-top: 6px; display: inline-block; }
+
+  /* ======== FOOTER ======== */
+  footer {
+    max-width: 880px; margin: 0 auto; padding: 32px 24px 60px;
+    color: var(--muted-2); font-size: 0.85em;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    margin-top: 24px;
+  }
+  footer a { color: var(--muted); }
+  footer a:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- ============= NAV ============= -->
+<nav class="top">
+  <div class="inner">
+    <div class="brand">supachai-j <span class="dot">·</span> github.io</div>
+    <div class="links">
+      <a href="#about" class="hide-sm">About</a>
+      <a href="#work">Work</a>
+      <a href="#contact">Contact</a>
+      <a href="https://github.com/supachai-j">GitHub ↗</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============= HERO ============= -->
+<section class="hero">
+  <div class="inner">
+    <p class="greeting"><span class="wave">👋</span> Hi, I'm</p>
+    <h1>Supachai Jaturaprom</h1>
+    <p class="role">Engineer · Educator · <span class="accent">Bangkok</span></p>
+    <p class="role-th">วิศวกร · ผู้สอน · กรุงเทพมหานคร</p>
+    <p class="lede">
+      I build and teach training material on modern infrastructure and AI —
+      Kubernetes, cloud-native security, and now <strong>AI agents</strong>.
+      Bilingual content (English + ไทย) for engineering teams in Thailand and beyond.
+    </p>
+    <div class="ctas">
+      <a class="btn primary" href="#work">See latest work →</a>
+      <a class="btn ghost" href="https://github.com/supachai-j">All repos on GitHub</a>
+    </div>
+    <div class="meta-strip">
+      <span>📍 Bangkok, Thailand</span>
+      <span>📚 141+ public repos</span>
+      <span>✍️ <a href="https://jaturaprom.medium.com/">writing on Medium</a></span>
+    </div>
+  </div>
+</section>
+
+<!-- ============= ABOUT ============= -->
+<section class="block about" id="about">
+  <span class="section-label">About</span>
+  <h2 class="section-title">Engineering education, mostly in Thai</h2>
+  <p>
+    I've been writing and teaching workshops for over a decade — Cisco labs back in the day,
+    then Kubernetes, then container security, and now <strong>AI agents and the
+    Anthropic ecosystem</strong>. The through-line is the same: take something complex,
+    write it down clearly, in <em>both</em> the language the docs are in and the
+    language my students think in.
+  </p>
+  <p>
+    Most of my recent work is bilingual — English for the technical primary sources,
+    Thai for the explanations that actually unlock the concept for people in the room.
+  </p>
+  <div class="stack">
+    <span class="tag">Agent Skills</span>
+    <span class="tag">Anthropic Claude</span>
+    <span class="tag">Kubernetes</span>
+    <span class="tag">CKA</span>
+    <span class="tag">Cloud-native security</span>
+    <span class="tag">EVE-NG / Cisco labs</span>
+    <span class="tag">Bilingual (EN/TH)</span>
+  </div>
+</section>
+
+<!-- ============= FEATURED ============= -->
+<section class="block" id="work">
+  <span class="section-label">Latest work</span>
+  <h2 class="section-title">Featured</h2>
+
+  <a class="featured" href="https://supachai-j.github.io/agent-skills-training/">
+    <div class="meta">
+      <span class="pill">Bilingual training</span>
+      <span class="live">Live</span>
+      <span style="color: var(--muted-2);">May 2026</span>
+    </div>
+    <h3>Agent Skills 101</h3>
+    <p class="h3-th">Agent Skills เจาะลึกเชิงเทคนิค — บทเรียนสองภาษา</p>
+    <p class="desc">
+      A self-paced engineering training on <strong>Anthropic's Agent Skills open
+      standard</strong>. Covers SKILL.md anatomy, progressive disclosure, the cross-client
+      ecosystem, authoring best practices, evaluation-driven description optimization, and
+      a 7-step team rollout playbook. Built bilingual from day one.
+    </p>
+    <div class="stats-row">
+      <div class="stat"><div class="n">12</div><div class="l">modules</div></div>
+      <div class="stat"><div class="n">38+</div><div class="l">adopting clients</div></div>
+      <div class="stat"><div class="n">17</div><div class="l">cited wiki pages</div></div>
+      <div class="stat"><div class="n">2</div><div class="l">languages</div></div>
+    </div>
+    <div class="actions">
+      <span class="go">Open the course →</span>
+      <span>Course (EN)</span>
+      <span>หลักสูตร (TH)</span>
+      <span>Slides EN/TH</span>
+      <span>Wiki + sources</span>
+    </div>
+  </a>
+</section>
+
+<!-- ============= MORE ============= -->
+<section class="block">
+  <div class="more">
+    <p>
+      <strong>More projects:</strong>
+      Kubernetes workshops · CKA Thai course · Oracle 101 ebook · cloud-native security labs · 130+ more →
+    </p>
+    <a class="btn ghost" href="https://github.com/supachai-j?tab=repositories">Browse all on GitHub</a>
+  </div>
+</section>
+
+<!-- ============= CONTACT ============= -->
+<section class="block" id="contact">
+  <span class="section-label">Contact</span>
+  <h2 class="section-title">Find me</h2>
+
+  <div class="contact-grid">
+    <a class="contact-card" href="https://github.com/supachai-j">
+      <div class="platform">GitHub</div>
+      <div class="handle">@supachai-j</div>
+      <span class="arrow">github.com/supachai-j ↗</span>
+    </a>
+    <a class="contact-card" href="https://jaturaprom.medium.com/">
+      <div class="platform">Medium</div>
+      <div class="handle">@jaturaprom</div>
+      <span class="arrow">jaturaprom.medium.com ↗</span>
+    </a>
+    <a class="contact-card" href="https://twitter.com/supachaisu">
+      <div class="platform">Twitter / X</div>
+      <div class="handle">@supachaisu</div>
+      <span class="arrow">twitter.com/supachaisu ↗</span>
+    </a>
+    <a class="contact-card" href="mailto:jaturaprom.su@gmail.com">
+      <div class="platform">Email</div>
+      <div class="handle">Get in touch</div>
+      <span class="arrow">jaturaprom.su@gmail.com ↗</span>
+    </a>
+  </div>
+</section>
+
+<!-- ============= FOOTER ============= -->
+<footer>
+  <p>Built with care · 2026 · <a href="https://github.com/supachai-j/supachai-j.github.io">source on GitHub</a></p>
+</footer>
+
+</body>
+</html>
